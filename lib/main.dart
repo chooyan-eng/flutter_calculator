@@ -26,6 +26,25 @@ enum Operator { plus, minus, time, divide }
 
 class _MyHomePageState extends State<MyHomePage> {
   final _panelActions = <String, VoidCallback>{};
+  final _operatorStrings = <Operator, String>{
+    Operator.plus: '+',
+    Operator.minus: '-',
+    Operator.time: '*',
+    Operator.divide: '/',
+  };
+
+  num? _leftOperand;
+  num? _rightOperand;
+  Operator? _operator;
+  num? _result;
+
+  String get _statement {
+    return [
+      _leftOperand?.toString() ?? '',
+      _operatorStrings[_operator] ?? '',
+      _rightOperand?.toString() ?? '',
+    ].where((element) => element != '').join(' ');
+  }
 
   @override
   void initState() {
@@ -49,16 +68,31 @@ class _MyHomePageState extends State<MyHomePage> {
       '-': () => _inputOperator(Operator.minus),
       '*': () => _inputOperator(Operator.time),
       '/': () => _inputOperator(Operator.divide),
-      '=': () => _inputOperator(Operator.divide),
+      '=': _calculate,
     });
     super.initState();
   }
 
-  void _inputNumber(int number) {}
+  void _inputNumber(int number) {
+    setState(() {
+      if (_operator == null) {
+        _leftOperand = (_leftOperand ?? 0) * 10 + number;
+      } else {
+        _rightOperand = (_rightOperand ?? 0) * 10 + number;
+      }
+    });
+  }
 
   void _inputZero({int digits = 1}) {}
 
-  void _clear() {}
+  void _clear() {
+    setState(() {
+      _leftOperand = null;
+      _operator = null;
+      _rightOperand = null;
+      _result = null;
+    });
+  }
 
   void _toggleSign() {}
 
@@ -66,7 +100,30 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _inputDot() {}
 
-  void _inputOperator(Operator opr) {}
+  void _inputOperator(Operator opr) {
+    setState(() {
+      _operator = opr;
+    });
+  }
+
+  void _calculate() {
+    setState(() {
+      switch (_operator!) {
+        case Operator.plus:
+          _result = _leftOperand! + _rightOperand!;
+          break;
+        case Operator.minus:
+          _result = _leftOperand! - _rightOperand!;
+          break;
+        case Operator.time:
+          _result = _leftOperand! * _rightOperand!;
+          break;
+        case Operator.divide:
+          _result = _leftOperand! / _rightOperand!;
+          break;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,11 +146,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '10 + 1000',
+                      _statement,
                       style: const TextStyle(fontSize: 20),
                     ),
                     Text(
-                      '1010',
+                      _result?.toString() ?? '',
                       style: const TextStyle(fontSize: 40),
                     ),
                   ],

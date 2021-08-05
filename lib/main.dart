@@ -68,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
       '-': () => _inputOperator(Operator.minus),
       '*': () => _inputOperator(Operator.time),
       '/': () => _inputOperator(Operator.divide),
-      '=': _calculate,
+      '=': _calculate
     });
     super.initState();
   }
@@ -83,13 +83,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _inputZero({int digits = 1}) {}
+  void _inputZero({int digits = 1}) {
+    for (final _ in Iterable.generate(digits)) {
+      _inputNumber(0);
+    }
+  }
 
   void _clear() {
     setState(() {
       _leftOperand = null;
-      _operator = null;
       _rightOperand = null;
+      _operator = null;
       _result = null;
     });
   }
@@ -107,6 +111,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _calculate() {
+    if (_operator == null || _leftOperand == null || _rightOperand == null) {
+      return;
+    }
     setState(() {
       switch (_operator!) {
         case Operator.plus:
